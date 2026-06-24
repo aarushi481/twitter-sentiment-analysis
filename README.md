@@ -13,6 +13,24 @@ The project uses text preprocessing techniques, TF-IDF vectorization, and a Logi
 
 ---
 
+## 📸 Dashboard Preview
+
+### Main Dashboard
+
+![Dashboard](assets/dashboard.png)
+
+### Sentiment Prediction
+
+![Prediction](assets/prediction.png)
+
+### Sentiment Distribution
+
+![Sentiment Chart](assets/sentimentchart.png)
+
+### Word Cloud
+
+![Word Cloud](assets/wordcloud.png)
+
 ## 🚀 Features
 
 ✅ Tweet Sentiment Classification
