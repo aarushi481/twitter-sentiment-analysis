@@ -51,6 +51,8 @@ The project uses text preprocessing techniques, TF-IDF vectorization, and a Logi
 
 ✅ Text Preprocessing using NLP
 
+✅ Batch CSV Prediction for tweet exports
+
 ---
 
 ## 🧠 Machine Learning Pipeline
@@ -141,6 +143,21 @@ Sentiment Prediction
      ▼
 Streamlit Dashboard
 ```
+
+## Batch CSV Prediction
+
+The dashboard can score multiple exported tweets from a CSV file. Upload a file
+up to 2 MB and 5,000 rows with one of these text columns:
+
+- `text`
+- `tweet`
+- `tweet_text`
+- `full_text`
+- `content`
+- `body`
+
+The app appends a `predicted_sentiment` column and lets you download the
+annotated CSV.
 
 ---
 
