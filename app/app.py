@@ -28,6 +28,32 @@ st.set_page_config(
 import pandas as pd
 import matplotlib.pyplot as plt
 
+TEXT_COLUMN_CANDIDATES = {
+    "text",
+    "tweet",
+    "tweet_text",
+    "full_text",
+    "content",
+    "body",
+}
+MAX_UPLOAD_BYTES = 2 * 1024 * 1024
+MAX_BATCH_ROWS = 5000
+
+
+def find_text_column(columns):
+    normalized = {str(column).strip().lower(): column for column in columns}
+    for candidate in TEXT_COLUMN_CANDIDATES:
+        if candidate in normalized:
+            return normalized[candidate]
+    return None
+
+
+def predict_batch(texts):
+    cleaned = texts.fillna("").astype(str).map(clean_tweet)
+    vectors = vectorizer.transform(cleaned)
+    return model.predict(vectors)
+
+
 df = pd.read_csv("data/Tweets.csv")
 
 
@@ -147,3 +173,34 @@ st.dataframe(st.session_state.history)
 if st.button("Clear History"):
     st.session_state.history = []
     st.rerun()
+
+
+st.subheader("Batch CSV Prediction")
+
+uploaded_file = st.file_uploader("Upload a CSV with a tweet text column", type=["csv"])
+
+if uploaded_file is not None:
+    if uploaded_file.size > MAX_UPLOAD_BYTES:
+        st.error("CSV is too large. Upload a file up to 2 MB.")
+    else:
+        try:
+            csv_data = pd.read_csv(uploaded_file, nrows=MAX_BATCH_ROWS + 1)
+        except Exception as exc:
+            st.error(f"Could not read CSV: {exc}")
+        else:
+            if len(csv_data) > MAX_BATCH_ROWS:
+                st.error(f"CSV has more than {MAX_BATCH_ROWS} rows. Trim it and upload again.")
+            else:
+                text_column = find_text_column(csv_data.columns)
+                if text_column is None:
+                    st.error("Add a text, tweet, tweet_text, full_text, content, or body column.")
+                else:
+                    results = csv_data.copy()
+                    results["predicted_sentiment"] = predict_batch(results[text_column])
+                    st.dataframe(results.head(20))
+                    st.download_button(
+                        "Download predictions",
+                        results.to_csv(index=False).encode("utf-8"),
+                        "sentiment_predictions.csv",
+                        "text/csv",
+                    )
